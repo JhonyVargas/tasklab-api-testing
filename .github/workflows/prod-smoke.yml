@@ -1,0 +1,34 @@
+name: Pruebas contra Producción (Render)
+
+# Ejecuta las pruebas de API contra la URL pública desplegada en Render.
+# Configura la variable del repositorio PROD_URL (Settings > Secrets and variables > Actions > Variables).
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 13 * * *' # todos los días 08:00 hora Perú
+
+jobs:
+  produccion:
+    name: Cypress vs ${{ vars.PROD_URL }}
+    runs-on: ubuntu-latest
+    if: ${{ vars.PROD_URL != '' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Despertar el servicio (plan gratis de Render)
+        run: |
+          for i in $(seq 1 12); do
+            curl -sf "${{ vars.PROD_URL }}/api/health" && exit 0
+            echo "Esperando a Render... ($i)"; sleep 10
+          done
+          exit 1
+
+      - name: Ejecutar pruebas de API en producción
+        uses: cypress-io/github-action@v6
+        env:
+          BASE_URL: ${{ vars.PROD_URL }}
+        with:
+          spec: cypress/e2e/api/**/*.cy.js

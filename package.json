@@ -1,0 +1,36 @@
+{
+  "name": "tasklab-api-testing",
+  "version": "1.0.0",
+  "description": "API REST de tareas con frontend, probada con Cypress y desplegada en Render mediante GitHub Actions",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "cy:open": "cypress open",
+    "test": "cypress run",
+    "test:api": "cypress run --spec \"cypress/e2e/api/**/*.cy.js\"",
+    "test:ui": "cypress run --spec \"cypress/e2e/ui/**/*.cy.js\"",
+    "test:ci": "start-server-and-test start http://localhost:3000/api/health test",
+    "test:prod": "cypress run --spec \"cypress/e2e/api/**/*.cy.js\""
+  },
+  "keywords": [
+    "cypress",
+    "api-testing",
+    "express",
+    "github-actions",
+    "render"
+  ],
+  "author": "Jhony Vargas",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.3.0"
+  },
+  "devDependencies": {
+    "cypress": "^16.2.1",
+    "start-server-and-test": "^3.0.13"
+  }
+}

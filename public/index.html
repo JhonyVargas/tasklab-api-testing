@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TaskLab · API Testing con Cypress</title>
+  <meta name="description" content="API REST de tareas probada con Cypress, automatizada con GitHub Actions y desplegada en Render." />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧪</text></svg>" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="bg-glow" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <div class="brand">
+      <div class="logo">🧪</div>
+      <div>
+        <h1>TaskLab</h1>
+        <p>API REST · Cypress · GitHub Actions · Render</p>
+      </div>
+    </div>
+    <div class="topbar-right">
+      <a class="btn-ghost" href="https://github.com/JhonyVargas/tasklab-api-testing" target="_blank" rel="noopener">
+        <svg viewBox="0 0 16 16" width="16" height="16" fill="currentColor"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0016 8c0-4.42-3.58-8-8-8z"/></svg>
+        Repositorio
+      </a>
+      <div class="status-pill" data-cy="api-status">
+        <span class="dot"></span><span class="status-text">Conectando…</span>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Estadísticas -->
+    <section class="stats" aria-label="Estadísticas">
+      <article class="stat-card">
+        <span class="stat-label">Total</span>
+        <span class="stat-value" data-cy="stat-total">0</span>
+        <span class="stat-hint">tareas registradas</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Pendientes</span>
+        <span class="stat-value accent-amber" data-cy="stat-pendientes">0</span>
+        <span class="stat-hint">por completar</span>
+      </article>
+      <article class="stat-card">
+        <span class="stat-label">Completadas</span>
+        <span class="stat-value accent-green" data-cy="stat-completadas">0</span>
+        <span class="stat-hint">finalizadas</span>
+      </article>
+      <article class="stat-card progress-card">
+        <div class="ring" style="--p:0" data-cy="stat-progreso"><span>0%</span></div>
+        <div>
+          <span class="stat-label">Progreso</span>
+          <span class="stat-hint">del total de tareas</span>
+        </div>
+      </article>
+    </section>
+
+    <div class="grid">
+      <!-- Columna principal -->
+      <section class="panel">
+        <form class="new-task" data-cy="form-tarea" novalidate>
+          <div class="field grow">
+            <label for="titulo">Nueva tarea</label>
+            <input id="titulo" name="titulo" type="text" placeholder="¿Qué hay que hacer?" maxlength="100" autocomplete="off" data-cy="input-titulo" />
+          </div>
+          <div class="field">
+            <label for="prioridad">Prioridad</label>
+            <select id="prioridad" name="prioridad" data-cy="select-prioridad">
+              <option value="baja">Baja</option>
+              <option value="media" selected>Media</option>
+              <option value="alta">Alta</option>
+            </select>
+          </div>
+          <div class="field full">
+            <label for="descripcion">Descripción <span class="muted">(opcional)</span></label>
+            <input id="descripcion" name="descripcion" type="text" placeholder="Detalles de la tarea" maxlength="300" autocomplete="off" data-cy="input-descripcion" />
+          </div>
+          <p class="form-error" data-cy="form-error" role="alert"></p>
+          <button type="submit" class="btn-primary" data-cy="btn-agregar">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg>
+            Agregar tarea
+          </button>
+        </form>
+
+        <div class="toolbar">
+          <div class="tabs" role="tablist" data-cy="filtros">
+            <button class="tab active" data-filter="" role="tab">Todas</button>
+            <button class="tab" data-filter="pendiente" role="tab">Pendientes</button>
+            <button class="tab" data-filter="completada" role="tab">Completadas</button>
+          </div>
+          <div class="search">
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+            <input type="search" placeholder="Buscar…" data-cy="input-buscar" aria-label="Buscar tareas" />
+          </div>
+        </div>
+
+        <ul class="task-list" data-cy="lista-tareas"></ul>
+        <div class="empty" data-cy="vacio" hidden>
+          <div class="empty-icon">✨</div>
+          <p>No hay tareas aquí</p>
+        </div>
+      </section>
+
+      <!-- Consola de API -->
+      <aside class="panel console" aria-label="Consola de la API">
+        <div class="console-head">
+          <div>
+            <h2>Consola de API</h2>
+            <p class="muted">Cada acción de la interfaz es una petición HTTP real</p>
+          </div>
+          <button class="btn-ghost small" data-cy="btn-limpiar-consola">Limpiar</button>
+        </div>
+        <ol class="log" data-cy="consola"></ol>
+
+        <div class="endpoints">
+          <h3>Endpoints</h3>
+          <ul>
+            <li><span class="m get">GET</span><code>/api/health</code></li>
+            <li><span class="m get">GET</span><code>/api/stats</code></li>
+            <li><span class="m get">GET</span><code>/api/tareas</code></li>
+            <li><span class="m get">GET</span><code>/api/tareas/:id</code></li>
+            <li><span class="m post">POST</span><code>/api/tareas</code></li>
+            <li><span class="m put">PUT</span><code>/api/tareas/:id</code></li>
+            <li><span class="m delete">DELETE</span><code>/api/tareas/:id</code></li>
+          </ul>
+        </div>
+      </aside>
+    </div>
+  </main>
+
+  <footer class="footer">
+    Hecho con Express + Cypress · Actividad Grupal 2: API Testing · Jhony Vargas
+  </footer>
+
+  <div class="toasts" aria-live="polite"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
