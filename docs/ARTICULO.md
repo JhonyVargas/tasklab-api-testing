@@ -166,7 +166,7 @@ Resultado local: **33 pruebas en verde** ✅
 
 ## 8. Automatización con GitHub Actions
 
-Cada `push` o `pull request` a `main` levanta la API y ejecuta Cypress con la acción oficial:
+Cada `push` o `pull request` a `main` levanta la API y ejecuta Cypress:
 
 ```yaml
 name: CI - Pruebas de API con Cypress
@@ -180,15 +180,18 @@ jobs:
   cypress:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          node-version: 20
-      - uses: cypress-io/github-action@v6
-        with:
-          start: npm start
-          wait-on: 'http://localhost:3000/api/health'
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run test:ci
 ```
+
+`test:ci` usa `start-server-and-test`: levanta la API, espera a que `/api/health` responda y luego ejecuta Cypress. Así el CI hace exactamente lo mismo que en local.
+
+> ⚠️ Cypress 16 requiere Node 22 o superior; con Node 20 el pipeline falla.
 
 ## 9. Despliegue en Render (solo si las pruebas pasan)
 

@@ -23,7 +23,7 @@
   "author": "Jhony Vargas",
   "license": "MIT",
   "engines": {
-    "node": ">=18"
+    "node": ">=22"
   },
   "dependencies": {
     "cors": "^2.8.6",
